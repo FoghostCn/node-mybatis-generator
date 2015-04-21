@@ -1,0 +1,20 @@
+{
+  "name": "node-mybatis-generator",
+  "version": "0.1.0",
+  "description": "an generator for mybatis write with nodejs",
+  "main": "app.js",
+  "keywords": [
+    "mybatis",
+    "gen",
+    "generator",
+    "nodejs",
+    "node"
+  ],
+  "author": "foghost",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^0.9.0",
+    "ejs": "^2.3.1",
+    "mysql": "^2.6.2"
+  }
+}
