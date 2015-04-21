@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.org.mapper.<%=schema.modelName%>Mapper">
+    <resultMap id="BaseResultMap" type="com.org.model.<%=schema.modelName%>">
+<% schema.fields.forEach(function(f){
+    if (f.isKey) { %>
+        <id column="<%=f.column%>" property="<%=f.property%>" jdbcType="<%=f.jdbcType %>"/>
+    <%} else {%>
+        <result column="<%=f.column%>" property="<%=f.property%>" jdbcType="<%=f.jdbcType %>"/>
+<% }
+})%>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <%=columns = schema.fields.map(function(e){return e.column}).join()%>
+    </sql>
+
+    <insert id="add" parameterType="com.org.model.<%=schema.modelName%>">
+        insert into <%=schema.tableName%>  (<%=columns%>)
+        values (
+        <% schema.fields.forEach(function(e, i){ %>
+          #{<%=e.property%>,jdbcType=<%=e.jdbcType%>}<% if(i<schema.fields.length-1){%>,<%}%>
+        <% })%>
+        )
+    </insert>
+
+    <select id="getById" resultMap="BaseResultMap" parameterType="string">
+        select <include refid="Base_Column_List"/>
+        from <%=schema.tableName%> t
+        where
+        t.<%=schema.key.column%> = #{<%=schema.key.property%>}
+    </select>
+
+    <sql id="search_clause">
+        <where>
+            <if test="entity != null">
+                <if test="entity.status == null">
+                    and t.status = 1
+                </if>
+                <if test="entity.status != null">
+                    and t.status = {entity.status}
+                </if>
+            </if>
+            <if test="entity == null">
+                and t.status = 1
+            </if>
+        </where>
+    </sql>
+
+    <select id="getList" resultMap="BaseResultMap" parameterType="com.org.base.PageVo">
+        select
+        <include refid="Base_Column_List"/>
+        from <%=schema.tableName%> t
+        <include refid="search_clause"/>
+        order by t.created_on desc
+        <if test="isPaging != 0">
+            limit #{from},#{size}
+        </if>
+    </select>
+
+    <select id="getCount" resultType="long" parameterType="com.org.model.<%=schema.modelName%>">
+        select count(1) from <%=schema.tableName%> t
+        <include refid="search_clause"/>
+    </select>
+
+    <update id="modify" parameterType="com.org.model.<%=schema.modelName%>">
+        update <%=schema.tableName%> t
+        <set>
+        <% schema.fields.forEach(function(e, i){ 
+            if (!e.isKey) {%>
+            <if test="<%=e.property%> != null">
+                t.<%=e.column%> = #{<%=e.property%>,jdbcType=<%=e.jdbcType%>}<% if(i<schema.fields.length-1){%>,<%}%>
+            </if>
+        <% }})%>
+        </set>
+        where
+        t.<%=schema.key.column%> = #{<%=schema.key.property%>}
+    </update>
+
+    <update id="delete" parameterType="string">
+      update <%=schema.tableName%> t set t.status = 0 where t.id = #{value}
+    </update>
+</mapper>
