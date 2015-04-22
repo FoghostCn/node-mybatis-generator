@@ -2,4 +2,3 @@ mybatis-gen.iml
 .idea
 dist
 node_modules
-templates

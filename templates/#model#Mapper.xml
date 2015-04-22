@@ -12,7 +12,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        <%=columns = schema.fields.map(function(e){return e.column}).join()%>
+        <%=columns = schema.fields.map(function(e){return 't.' + e.column}).join()%>
     </sql>
 
     <insert id="add" parameterType="com.org.model.<%=schema.modelName%>">
@@ -38,7 +38,7 @@
                     and t.status = 1
                 </if>
                 <if test="entity.status != null">
-                    and t.status = {entity.status}
+                    and t.status = #{entity.status}
                 </if>
             </if>
             <if test="entity == null">
